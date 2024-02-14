@@ -12,7 +12,7 @@ public actor FDACache<T: Any> {
     @Published public var removedItem: T?
 
     // MARK: Lifecycle
-    init(maxItems: Int = 0, decoder: FDACacheDecoder = JSONDecoder()) {
+    public init(maxItems: Int = 0, decoder: FDACacheDecoder = JSONDecoder()) {
         cache = InternalCache<NSString, FDACacheObject<T>>(limit: maxItems)
         self.decoder = decoder
 
