@@ -2,10 +2,10 @@ import XCTest
 @testable import FDACache
 
 final class FDACacheTests: XCTestCase {
-    var sut: FDACache<Foo>!
+    var sut: FDACache!
 
     override func setUpWithError() throws {
-        sut = FDACache<Foo>()
+        sut = FDACache()
     }
 
     override func tearDownWithError() throws {
@@ -20,8 +20,10 @@ final class FDACacheTests: XCTestCase {
 
         // When
         do {
-            let result: Foo = try await sut.get(key, transform: {
-                $0.bar.data(using: .utf8)
+            let result: Foo = try await sut
+                .get(key,
+                     transform: {
+                    ($0 as? Foo)?.bar.data(using: .utf8)
             })
             XCTFail("Unexpected result \(result)")
         } catch {
@@ -38,7 +40,8 @@ final class FDACacheTests: XCTestCase {
         // When
         await sut.set(key, value: value)
 
-        let result = await sut.get(key)
+        let result = await sut.get(key) as? Foo
+
 
         // Then
         XCTAssertEqual(value, result)
@@ -50,23 +53,16 @@ final class FDACacheTests: XCTestCase {
         let value = Foo(bar: "baz")
 
         // When
-        await sut.set(key as String, value: value)
+        await sut.set(key, value: value)
 
         do {
-            let _: Foo = try await sut.get(key as String, transform: { _ in nil })
+            let _: Foo = try await sut
+                .get(key,
+                     transform: { _ in nil })
             XCTFail("Unexpected result")
         } catch {
             // Then
             XCTAssertEqual(FDACacheError.nonParseable, error as? FDACacheError)
         }
     }
-
-
-
-
 }
-
-
-/*
-
- */

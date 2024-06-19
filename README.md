@@ -14,10 +14,10 @@ Here's an example of how to use FDACache:
 ```swift
 import FDACache
 
-let cache = FDACache<Foo>()
-cache.set("foo", value: Foo())
+let cache = FDACache()
+await cache.set("foo", value: Foo())
 
-let cachedFoo: Foo = cache.get("foo")
+let cachedFoo: Foo = try await cache.get("foo")
 ```
 
 ## License

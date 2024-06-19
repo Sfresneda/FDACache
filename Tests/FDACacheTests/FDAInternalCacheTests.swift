@@ -2,10 +2,10 @@ import XCTest
 @testable import FDACache
 
 final class FDAInternalCacheTests: XCTestCase {
-    var sut: InternalCache<NSString, NSString>!
+    var sut: InternalCache<NSString>!
 
     override func setUp() {
-        sut = InternalCache()
+        sut = InternalCache(limit: 1, lifeTime: 600.0)
     }
     
     override func tearDown() {
@@ -14,17 +14,18 @@ final class FDAInternalCacheTests: XCTestCase {
 
     // MARK: - Set
 
-    func test_set_andGetShouldSucceed() async {
+    func test_set_andGetShouldSucceed() {
         // Given
         let key: NSString = "foo"
         let value: NSString = "bar"
 
         // When
         sut.set(key, value: value)
-        let result = sut.get(key)
+        let result = sut.get(key) as? FDACacheObject
 
         // Then
-        XCTAssertEqual(value, result)
+
+        XCTAssertEqual(value, result?.data as? NSString)
     }
     
     func test_set_andGetWrongValueShouldReturnNil() {
@@ -90,5 +91,20 @@ final class FDAInternalCacheTests: XCTestCase {
         // Then
         XCTAssertNotNil(result)
         XCTAssertNil(result2)
+    }
+
+    // MARK: - Lifetime
+    func test_get_outdate_shouldFail() {
+        // Given
+        let key: NSString = "foo"
+        let value: NSString = "bar"
+        let sut = InternalCache<NSString>(limit: 1,
+                                          lifeTime: -1)
+        // When
+        sut.set(key, value: value)
+        let result = sut.get(key)
+
+        // Then
+        XCTAssertNil(result)
     }
 }
